@@ -15,9 +15,6 @@ jobs:
       - uses: LouisBrunner/checks-action@v1.1.1
         with:
           token: ${{ secrets.GITHUB_TOKEN }}
-          private-key: ${{ secrets.GH_APP_PRIVATE_KEY }}
-          app-id: ${{ secrets.GH_APP_ID }}
-          owner: ${{ github.repository_owner }}
           name: staging-test
           status: queued
   # プッシュではない時の処理
@@ -48,9 +45,6 @@ jobs:
         if: github.event_name == 'repository_dispatch'
         with:
           token: ${{ secrets.GITHUB_TOKEN }}
-          private-key: ${{ secrets.GH_APP_PRIVATE_KEY }}
-          app-id: ${{ secrets.GH_APP_ID }}
-          owner: ${{ github.repository_owner }}
           check_id: ${{steps.get-staging-test-check-runs-id.outputs.result}}
           status: completed
           # successならばsuccessにし、それ以外はfailureにする
