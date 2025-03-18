@@ -2,7 +2,7 @@ name: develop-test-actions
 on:
   push:
     branches:
-      - main
+      - develop
   repository_dispatch:
     types: [success, failure]
 jobs:
