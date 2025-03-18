@@ -23,6 +23,8 @@ phases:
   build:
     commands:
       - echo Build started on `date`
+      - cd hello-world
+      - mvn clean
       - mvn package
 
   post_build:
