@@ -1,0 +1,51 @@
+name: develop-test-actions
+on:
+  push:
+    branches:
+      - main
+  repository_dispatch:
+    types: [success, failure]
+jobs:
+  # プッシュされた時はqueueにする
+  init:
+    if: github.event_name == 'push'
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v2.3.4
+      - uses: LouisBrunner/checks-action@v1.1.1
+        with:
+          token: ${{ secrets.PERSONAL_ACCESS_TOKEN }}_TOKEN }}
+          name: staging-test
+          status: queued
+  # プッシュではない時の処理
+  update_checks:
+    if: github.event_name != 'push'
+    runs-on: ubuntu-latest
+    steps:
+      # 最新のCheck RunsのIDを取得する
+      # 最新のCheck RunsのIDは${{steps.get-staging-test-check-runs-id.outputs.result}}にstring形式で格納される
+      - uses: actions/checkout@v2.3.4
+      - name: Return issues
+        uses: actions/github-script@v2
+        id: get-staging-test-check-runs-id
+        with:
+          script: |
+            // github-scriptでnameがstaging-testのCheck RunsのIDの一覧を新順で取得する
+            const list = await github.checks.listForRef({
+                    owner: context.repo.owner,
+                    repo: context.repo.repo,
+                    ref: 'staging',
+                    check_name: 'staging-test',
+                    filter: 'latest'
+                });
+            return list.data.check_runs[0].id;
+          result-encoding: string
+      # repository_dispatchの結果を最新のCheck Runsに反映する
+      - uses: LouisBrunner/checks-action@v1.1.1
+        if: github.event_name == 'repository_dispatch'
+        with:
+          token: ${{ secrets.PERSONAL_ACCESS_TOKEN }}_TOKEN }}
+          check_id: ${{steps.get-staging-test-check-runs-id.outputs.result}}
+          status: completed
+          # successならばsuccessにし、それ以外はfailureにする
+          conclusion: ${{ (github.event.action == 'success' && 'success' ) || 'failure'  }}
