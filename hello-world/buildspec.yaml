@@ -1,0 +1,36 @@
+version: 0.2
+
+phases:
+  install:
+    runtime-versions:
+      java: corretto17
+    commands:
+      - java -version
+      - echo Installing Maven...
+      - wget https://archive.apache.org/dist/maven/maven-3/3.8.4/binaries/apache-maven-3.8.4-bin.tar.gz
+      - tar -xvzf apache-maven-3.8.4-bin.tar.gz 
+      - mv apache-maven-3.8.4 /opt/maven
+      - export M2_HOME=/opt/maven
+      - export PATH=${M2_HOME}/bin:${PATH}
+      - echo 'export M2_HOME=/opt/maven' >> ~/.bashrc
+      - echo 'export PATH=${M2_HOME}/bin:${PATH}' >> ~/.bashrc
+      - mvn --version
+
+  pre_build:
+    commands:
+      - echo Running pre-build steps...
+
+  build:
+    commands:
+      - echo Build started on `date`
+      - cd hello-world
+      - mvn clean
+      - mvn package
+
+  post_build:
+    commands:
+      - echo Build completed on `date`
+
+artifacts:
+  files:
+    - '**/*'
