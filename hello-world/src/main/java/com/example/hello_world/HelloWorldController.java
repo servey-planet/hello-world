@@ -11,5 +11,9 @@ public class HelloWorldController {
     public String helloWorld() {
         return new String("Hello World!!");
     }
+    @GetMapping("/test")
+    public String test() {
+        return new String("Test Completed!!");
+    }
     
 }
